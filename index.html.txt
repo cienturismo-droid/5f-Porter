@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Porter — Aeromexico</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;min-height:100vh;overflow-x:hidden}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#F1F8E9;padding:12px}
+.wrap{max-width:660px;margin:0 auto}
+
+/* HEADER */
+.hdr{background:#1B5E20;border-radius:14px;padding:16px 18px;margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.hdr-icon{width:40px;height:40px;background:#2E7D32;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;color:#A5D6A7;font-weight:700}
+.hdr-title{color:#fff;font-size:15px;font-weight:700;line-height:1.3}
+.hdr-sub{color:#A5D6A7;font-size:11px;margin-top:2px}
+
+/* TABS */
+.tabs{display:flex;background:#fff;border-radius:10px;padding:4px;gap:4px;margin-bottom:14px;border:1px solid #C8E6C9}
+.tab{flex:1;padding:9px 6px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:transparent;color:#888;transition:all .15s;text-align:center;white-space:nowrap}
+.tab.active{background:#1B5E20;color:#fff}
+.tab:hover:not(.active){background:#F1F8E9;color:#333}
+
+/* CARD */
+.card{background:#fff;border-radius:12px;border:1px solid #C8E6C9;padding:18px;margin-bottom:12px}
+
+/* NAME STEP */
+.n-title{font-size:16px;font-weight:700;color:#1B5E20;margin-bottom:8px}
+.n-desc{font-size:12px;color:#555;line-height:1.7;margin-bottom:16px}
+.n-desc strong{color:#1B5E20}
+.score-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.pill{padding:4px 10px;border-radius:99px;font-size:11px;font-weight:700;border:1px solid}
+.pill-g{background:#E8F5E9;color:#1B5E20;border-color:#A5D6A7}
+.pill-b{background:#E3F2FD;color:#0D47A1;border-color:#90CAF9}
+.pill-a{background:#FFF8E1;color:#E65100;border-color:#FFD54F}
+.inp-row{display:flex;gap:8px}
+.n-input{flex:1;padding:11px 13px;border-radius:8px;border:1.5px solid #C8E6C9;font-size:14px;color:#212121;background:#FAFAFA;transition:border-color .15s;min-width:0}
+.n-input:focus{outline:none;border-color:#2E7D32;background:#fff}
+.go-btn{padding:11px 20px;border-radius:8px;background:#1B5E20;color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s}
+.go-btn:hover{background:#2E7D32}
+.go-btn:disabled{background:#A5D6A7;cursor:not-allowed}
+
+/* HUD */
+.hud{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.hc{background:#fff;border-radius:10px;border:1px solid #C8E6C9;padding:10px 12px;text-align:center}
+.hl{font-size:10px;color:#888;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:2px}
+.hv{font-size:20px;font-weight:700;color:#212121}
+.hv.g{color:#1B5E20}.hv.r{color:#C62828}
+
+/* PROGRESS */
+.pb-wrap{background:#fff;border-radius:10px;border:1px solid #C8E6C9;padding:10px 14px;margin-bottom:12px}
+.pb-row{display:flex;justify-content:space-between;font-size:11px;color:#888;margin-bottom:5px;font-weight:600}
+.pb{height:6px;background:#E8F5E9;border-radius:99px;overflow:hidden}
+.pf{height:100%;background:#2E7D32;border-radius:99px;transition:width .4s}
+
+/* FORCE TABS */
+.ftabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.ft{padding:6px 11px;border-radius:99px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid #C8E6C9;background:#fff;color:#777;transition:all .15s;white-space:nowrap}
+.ft:hover:not(.fd){border-color:#999;color:#333}
+.ft.fd{opacity:.6;pointer-events:none}
+.ft.f0.fa,.ft.f0.fd{background:#EEEDFE;border-color:#534AB7;color:#3C3489}
+.ft.f1.fa,.ft.f1.fd{background:#E1F5EE;border-color:#0F6E56;color:#085041}
+.ft.f2.fa,.ft.f2.fd{background:#FAECE7;border-color:#993C1D;color:#712B13}
+.ft.f3.fa,.ft.f3.fd{background:#E6F1FB;border-color:#185FA5;color:#0C447C}
+.ft.f4.fa,.ft.f4.fd{background:#FAEEDA;border-color:#854F0B;color:#633806}
+
+/* QUESTION */
+.qm{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.qb{font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;letter-spacing:.05em;text-transform:uppercase}
+.qp{margin-left:auto;font-size:11px;color:#888;font-weight:700}
+.qt{font-size:13px;font-weight:600;color:#212121;line-height:1.55;margin-bottom:12px}
+.opts{display:flex;flex-direction:column;gap:7px}
+.opt{padding:10px 13px;border-radius:8px;border:1.5px solid #E0E0E0;background:#FAFAFA;font-size:12px;color:#333;cursor:pointer;text-align:left;transition:all .15s;line-height:1.45;font-weight:500}
+.opt:hover:not([disabled]){border-color:#999;background:#fff}
+.opt.ok{background:#E1F5EE;border-color:#1D9E75;color:#085041}
+.opt.no{background:#FFEBEE;border-color:#E53935;color:#B71C1C}
+.opt.rv{background:#E1F5EE;border-color:#1D9E75;color:#085041;opacity:.6}
+.fb{font-size:12px;line-height:1.65;margin-top:10px;padding:10px 12px;border-radius:8px}
+.fb-ok{background:#E1F5EE;color:#1B5E20;border-left:3px solid #2E7D32;border-radius:0 8px 8px 0}
+.fb-no{background:#FFEBEE;color:#B71C1C;border-left:3px solid #E53935;border-radius:0 8px 8px 0}
+.nxt{margin-top:10px;padding:10px;border-radius:8px;background:#1B5E20;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;width:100%;transition:background .15s}
+.nxt:hover{background:#2E7D32}
+
+/* FINAL */
+.fin-wrap{text-align:center;padding:4px 0}
+.fin-score{font-size:54px;font-weight:800;color:#1B5E20;line-height:1}
+.fin-lbl{font-size:13px;color:#888;margin:4px 0 12px}
+.bdown{display:flex;flex-direction:column;gap:5px;text-align:left;margin:12px 0}
+.br{display:flex;justify-content:space-between;font-size:12px;padding:7px 11px;border-radius:8px;background:#F1F8E9}
+.bn{color:#555;font-weight:500}.bp{font-weight:700;color:#1B5E20}
+.sp{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:8px 14px;border-radius:99px;margin-top:6px;font-weight:700}
+.sp-g{background:#E8F5E9;color:#1B5E20;border:1px solid #A5D6A7}
+.sp-gr{background:#F5F5F5;color:#666;border:1px solid #E0E0E0}
+.sp-w{background:#FFF8E1;color:#E65100;border:1px solid #FFD54F}
+.sav-msg{font-size:11px;color:#888;font-style:italic;margin-top:6px}
+.retry{margin-top:10px;padding:9px 18px;border-radius:8px;background:#F1F8E9;border:1.5px solid #C8E6C9;font-size:12px;font-weight:700;cursor:pointer;color:#444}
+
+/* TEACHER */
+.t-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.t-main{font-size:15px;font-weight:700;color:#1B5E20}
+.t-ct{font-size:11px;color:#888;margin-top:2px}
+.t-acts{display:flex;gap:7px;flex-wrap:wrap}
+.tb{padding:7px 13px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid #C8E6C9;background:#fff;color:#444;transition:all .15s}
+.tb:hover{background:#F1F8E9}
+.tb.dg{border-color:#FFCDD2;color:#C62828;background:#FFEBEE}
+
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+@media(min-width:460px){.sg{grid-template-columns:repeat(4,1fr)}}
+.sc{background:#F9FBF9;border-radius:10px;border:1px solid #C8E6C9;padding:11px 13px}
+.sl{font-size:10px;color:#888;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:3px}
+.sv{font-size:20px;font-weight:700;color:#212121}
+.sv.ac{color:#1B5E20}
+
+.stt{font-size:10px;font-weight:700;color:#888;letter-spacing:.06em;text-transform:uppercase;margin-bottom:7px}
+.fbars{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.fbr{display:flex;align-items:center;gap:9px;font-size:11px}
+.fbn{width:110px;color:#555;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fbt{flex:1;height:8px;background:#E8F5E9;border-radius:99px;overflow:hidden}
+.fbf{height:100%;border-radius:99px;background:#2E7D32;transition:width .5s}
+.fbf.md{background:#F57C00}.fbf.lw{background:#E53935}
+.fbp{width:32px;text-align:right;font-weight:700;color:#333;font-size:11px}
+
+.rtbl{width:100%;border-collapse:collapse;font-size:11px}
+.rtbl th{background:#F1F8E9;padding:8px 9px;text-align:left;font-weight:700;font-size:10px;color:#888;border-bottom:1.5px solid #C8E6C9;white-space:nowrap}
+.rtbl td{padding:8px 9px;border-bottom:1px solid #F0F4F0;color:#333;vertical-align:middle}
+.rtbl tr:hover td{background:#F9FBF9}
+.rn{width:22px;height:22px;border-radius:50%;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.rn1{background:#1B5E20;color:#fff}.rn2{background:#E8F5E9;color:#1B5E20;border:1.5px solid #A5D6A7}
+.rn3{background:#FFF8E1;color:#E65100;border:1.5px solid #FFD54F}.rnx{background:#F5F5F5;color:#888}
+.sc-cell{display:flex;align-items:center;gap:6px}
+.sb{height:6px;border-radius:99px;background:#2E7D32;flex-shrink:0;min-width:4px}
+.sb.md{background:#F57C00}.sb.lw{background:#E53935}
+.xp{display:inline-block;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:700;white-space:nowrap}
+.x1{background:#E8F5E9;color:#1B5E20;border:1px solid #A5D6A7}
+.x2{background:#FFF8E1;color:#E65100;border:1px solid #FFD54F}
+.x3{background:#F3E5F5;color:#6A1B9A;border:1px solid #CE93D8}
+.x4{background:#E3F2FD;color:#0D47A1;border:1px solid #90CAF9}
+.x5{background:#F1F8E9;color:#33691E;border:1px solid #C5E1A5}
+.xn{background:#F5F5F5;color:#999;border:1px solid #E0E0E0}
+
+.wb{background:#E8F5E9;border:1.5px solid #A5D6A7;border-radius:10px;padding:11px 15px;margin-bottom:12px;font-size:12px;color:#1B5E20;font-weight:700;display:flex;align-items:center;gap:9px}
+.ws{width:24px;height:24px;background:#1B5E20;border-radius:50%;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.sn{margin-top:10px;padding:9px 13px;background:#E8F5E9;border-radius:8px;font-size:11px;color:#2E7D32;font-weight:700;border:1px solid #A5D6A7}
+
+.ld{text-align:center;padding:28px;color:#888;font-size:13px}
+.sp2{width:22px;height:22px;border:3px solid #E8F5E9;border-top-color:#2E7D32;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.emp{text-align:center;padding:36px 16px;color:#888;font-size:13px}
+.emp .et{font-size:15px;font-weight:700;color:#444;margin-bottom:8px}
+
+/* Firebase config warning */
+.cfg-warn{background:#FFF8E1;border:1.5px solid #FFD54F;border-radius:10px;padding:13px 16px;margin-bottom:14px;font-size:12px;color:#5D4037;line-height:1.65;display:none}
+.cfg-warn code{background:#FFF3E0;padding:2px 6px;border-radius:4px;font-family:monospace;font-size:11px;color:#BF360C;word-break:break-all}
+
+@media(max-width:380px){
+  .inp-row{flex-direction:column}
+  .go-btn{width:100%}
+  .hud{grid-template-columns:1fr 1fr}
+  .hud .hc:last-child{grid-column:span 2}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hdr">
+    <div class="hdr-icon">&#9992;</div>
+    <div>
+      <div class="hdr-title">Las 5 Fuerzas de Porter &mdash; Aerom&eacute;xico</div>
+      <div class="hdr-sub">Administraci&oacute;n de Empresas Tur&iacute;sticas &middot; Licenciatura</div>
+    </div>
+  </div>
+
+  <div class="cfg-warn" id="cfg-warn">
+    <strong>&#9888; Paso pendiente:</strong> Antes de publicar, reemplaza la URL de Firebase en el c&oacute;digo.<br>
+    Busca: <code>const FIREBASE_URL = "https://f-porter-default-rtdb.firebaseio.com/";</code> y pega tu URL real.
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" id="ts" onclick="setMode('s')">&#127891; Modo alumno</button>
+    <button class="tab" id="tt" onclick="setMode('t')">&#128203; Panel docente</button>
+  </div>
+
+  <div id="sv"></div>
+  <div id="tv" style="display:none"></div>
+</div>
+
+<script>
+// ================================================================
+//  PON TU URL DE FIREBASE AQUI  (Realtime Database)
+//  Ejemplo: "https://mi-proyecto-xxxxx-default-rtdb.firebaseio.com"
+// ================================================================
+const FIREBASE_URL = "TU_URL_AQUI";
+// ================================================================
+
+const PATH = "/porter_aeromexico";
+const OK = FIREBASE_URL !== "TU_URL_AQUI" && FIREBASE_URL.includes("firebaseio");
+if(!OK) document.getElementById('cfg-warn').style.display='block';
+
+async function dbPost(d){
+  if(!OK) return null;
+  try{const r=await fetch(FIREBASE_URL+PATH+".json",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)});return await r.json();}
+  catch(e){return null;}
+}
+async function dbGet(){
+  if(!OK) return [];
+  try{const r=await fetch(FIREBASE_URL+PATH+".json");const d=await r.json();return d?Object.values(d):[];}
+  catch(e){return [];}
+}
+async function dbDel(){
+  if(!OK) return;
+  try{await fetch(FIREBASE_URL+PATH+".json",{method:"DELETE"});}catch(e){}
+}
+
+const F=[
+  {id:0,name:"Rivalidad entre competidores",sh:"Rivalidad",bg:"Fuerza 1",bg_:"#EEEDFE",bd:"#534AB7",tx:"#3C3489",
+   qs:[
+    {q:"Aerom\u00e9xico compite con Volaris y VivaAerobus en rutas como CDMX\u2013Canc\u00fan y CDMX\u2013Monterrey. Esta situaci\u00f3n describe...",
+     o:["El poder de negociaci\u00f3n de los proveedores de combustible","La rivalidad intensa entre competidores existentes","La amenaza de nuevos entrantes al mercado","El poder de los pasajeros frecuentes"],
+     a:1,p:100,
+     f:"La rivalidad mide la intensidad de la competencia entre aerol\u00edneas ya establecidas. Las rutas CDMX\u2013Canc\u00fan y CDMX\u2013Monterrey son de las m\u00e1s disputadas de M\u00e9xico: Aerom\u00e9xico, Volaris y VivaAerobus compiten agresivamente en precio, frecuencia y servicio."},
+    {q:"Las aerol\u00edneas low-cost ofrecen el mismo traslado a precios hasta 50% menores. \u00bfQu\u00e9 factor intensifica M\u00c1S la rivalidad?",
+     o:["La alta diferenciaci\u00f3n del servicio de Aerom\u00e9xico frente a las low-cost","Los altos costos de cambio del pasajero","La baja diferenciaci\u00f3n del producto b\u00e1sico (traslado de A a B) en rutas dom\u00e9sticas","La escasa cantidad de aeropuertos en M\u00e9xico"],
+     a:2,p:150,
+     f:"Cuando el producto es percibido como igual, la \u00fanica variable de decisi\u00f3n es el precio. Esto intensifica enormemente la rivalidad. Aerom\u00e9xico responde con Club Premier, salas VIP y alianzas SkyTeam para diferenciarse."},
+   ]},
+  {id:1,name:"Amenaza de nuevos entrantes",sh:"Nuevos entrantes",bg:"Fuerza 2",bg_:"#E1F5EE",bd:"#0F6E56",tx:"#085041",
+   qs:[
+    {q:"Mexicana de Aviaci\u00f3n se relanza en 2023 operando desde el AIFA. Seg\u00fan Porter, esto representa...",
+     o:["Rivalidad directa entre las aerol\u00edneas ya establecidas","Amenaza de nuevos entrantes al mercado a\u00e9reo mexicano","El poder de negociaci\u00f3n de los compradores corporativos","Una amenaza de producto sustituto al vuelo comercial"],
+     a:1,p:100,
+     f:"Un nuevo entrante ingresa al sector por primera vez. Mexicana se relanza con modelo nuevo y apoyo gubernamental, representando una amenaza real para las rutas donde compite con Aerom\u00e9xico."},
+    {q:"Aerom\u00e9xico controla 50 slots prioritarios en el AICM. Para una aerol\u00ednea nueva, esto representa...",
+     o:["Una ventaja que reduce sus costos operativos","Una barrera de entrada que dificulta competir con Aerom\u00e9xico en rutas clave","Un incentivo para que nuevas aerol\u00edneas entren al mercado","El poder de negociaci\u00f3n de los aeropuertos"],
+     a:1,p:150,
+     f:"Los slots del AICM son escasos y heredados de d\u00e9cadas de operaci\u00f3n. Una aerol\u00ednea nueva no puede obtenerlos f\u00e1cilmente, creando una barrera de entrada estructural que protege a Aerom\u00e9xico en sus rutas m\u00e1s rentables."},
+   ]},
+  {id:2,name:"Poder de proveedores",sh:"Proveedores",bg:"Fuerza 3",bg_:"#FAECE7",bd:"#993C1D",tx:"#712B13",
+   qs:[
+    {q:"Boeing anuncia retrasos en entregas y sube precios un 15%. El impacto directo para Aerom\u00e9xico seg\u00fan Porter es...",
+     o:["Aumento en la rivalidad con Volaris e Interjet","Incremento del poder de negociaci\u00f3n de Boeing sobre Aerom\u00e9xico","Reducci\u00f3n de la amenaza de nuevos entrantes","Mayor poder de negociaci\u00f3n de los pasajeros premier"],
+     a:1,p:100,
+     f:"Boeing y Airbus forman un duopolio global. Aerom\u00e9xico no puede cambiar de proveedor r\u00e1pidamente: pilotos certificados por tipo de aeronave, contratos de mantenimiento exclusivos. Esto da a Boeing un poder de negociaci\u00f3n muy alto."},
+    {q:"Aerom\u00e9xico contrata coberturas de precio (hedging) en combustible. El efecto estrat\u00e9gico es...",
+     o:["Incrementar la rivalidad con aerol\u00edneas low-cost","Reducir el poder de negociaci\u00f3n de PEMEX como proveedor de turbosina","Crear barreras de entrada para nuevas aerol\u00edneas","Aumentar el poder de compradores corporativos"],
+     a:1,p:150,
+     f:"El hedging permite a Aerom\u00e9xico fijar precios futuros del combustible, reduciendo su dependencia de los precios spot de PEMEX. Cuando el comprador tiene mecanismos de protecci\u00f3n, el poder del proveedor disminuye."},
+   ]},
+  {id:3,name:"Poder de compradores",sh:"Compradores",bg:"Fuerza 4",bg_:"#E6F1FB",bd:"#185FA5",tx:"#0C447C",
+   qs:[
+    {q:"Un pasajero compara vuelos CDMX\u2013Monterrey en Google Flights en 30 segundos. Seg\u00fan Porter, esto indica...",
+     o:["Alta amenaza de nuevos entrantes al sector a\u00e9reo","Baja rivalidad por lealtad de marca","Alto poder de negociaci\u00f3n de los compradores por informaci\u00f3n en tiempo real","Alta amenaza de sustitutos en esa ruta"],
+     a:2,p:100,
+     f:"El acceso instant\u00e1neo a precios comparados es el factor m\u00e1s poderoso que eleva el poder del comprador. Con cero costo de cambio y precios visibles, el pasajero tiene todo el poder. Club Premier busca crear retenci\u00f3n con millas acumuladas."},
+    {q:"Una agencia corporativa negocia 500 boletos mensuales con Aerom\u00e9xico. Comparada con un pasajero individual, esta agencia tiene...",
+     o:["Menos poder porque depende de Aerom\u00e9xico","Mayor poder de negociaci\u00f3n por el volumen y la posibilidad de cambiar de aerol\u00ednea","El mismo poder que cualquier pasajero individual","Ning\u00fan poder porque los precios los regula la SCT"],
+     a:1,p:150,
+     f:"El poder de negociaci\u00f3n se multiplica con el volumen. Una agencia que garantiza 500 viajes mensuales puede negociar tarifas especiales que un pasajero individual jam\u00e1s obtendr\u00eda."},
+   ]},
+  {id:4,name:"Amenaza de sustitutos",sh:"Sustitutos",bg:"Fuerza 5",bg_:"#FAEEDA",bd:"#854F0B",tx:"#633806",
+   qs:[
+    {q:"El Tren Maya conecta Canc\u00fan\u2013M\u00e9rida en 2.5 horas a menor precio que el vuelo. Para Aerom\u00e9xico esto representa...",
+     o:["Un competidor directo que entra al sector a\u00e9reo","Un producto sustituto que satisface la misma necesidad por otro medio","El poder de negociaci\u00f3n de compradores que prefieren el tren","Una barrera de entrada para nuevas aerol\u00edneas en esa ruta"],
+     a:1,p:100,
+     f:"Un sustituto compite desde otra industria (ferroviaria) para satisfacer la misma necesidad: trasladarse de un punto a otro. Si es competitivo en tiempo y precio, reduce la demanda de vuelos en esa ruta."},
+    {q:"\u00bfEn cu\u00e1l segmento la amenaza de sustituci\u00f3n es MENOR para Aerom\u00e9xico?",
+     o:["Turistas j\u00f3venes CDMX\u2013Acapulco con tiempo disponible en autob\u00fas","Ejecutivos que vuelan CDMX\u2013Nueva York con reuni\u00f3n el mismo d\u00eda","Familias que viajan CDMX\u2013Guadalajara en temporada vacacional","Estudiantes Monterrey\u2013Guadalajara en fin de semana"],
+     a:1,p:150,
+     f:"El ejecutivo con reuni\u00f3n en Nueva York el mismo d\u00eda no tiene sustituto viable. La amenaza de sustituci\u00f3n es inversamente proporcional a la urgencia del viaje, la distancia y el valor del tiempo del pasajero."},
+   ]},
+];
+
+const TQ=F.reduce((s,f)=>s+f.qs.length,0);
+const MP=F.reduce((s,f)=>s+f.qs.reduce((x,q)=>x+q.p,0),0);
+const EP=[1.0,0.8,0.6,0.4,0.2];
+const XC=['x1','x2','x3','x4','x5'];
+
+let mode='s';
+let nm='',sc=0,cor=0,err=0;
+let dn={0:false,1:false,2:false,3:false,4:false};
+let fs={0:0,1:0,2:0,3:0,4:0};
+let cf=null,cq=0,ans=false;
+
+function setMode(m){
+  mode=m;
+  document.getElementById('ts').classList.toggle('active',m==='s');
+  document.getElementById('tt').classList.toggle('active',m==='t');
+  document.getElementById('sv').style.display=m==='s'?'':'none';
+  document.getElementById('tv').style.display=m==='t'?'':'none';
+  if(m==='t') renderT();
+}
+
+function renderName(){
+  document.getElementById('sv').innerHTML=`
+  <div class="card">
+    <div class="n-title">Las 5 Fuerzas de Porter &mdash; Aerom&eacute;xico</div>
+    <div class="n-desc">Responde 10 preguntas sobre las Fuerzas de Porter aplicadas al caso Aerom&eacute;xico.<br>
+    <strong>Puntaje m&aacute;ximo: ${MP} puntos</strong></div>
+    <div class="score-pills">
+      <span class="pill pill-g">Pregunta b&aacute;sica = 100 pts</span>
+      <span class="pill pill-b">Pregunta de an&aacute;lisis = 150 pts</span>
+    </div>
+    <div class="n-desc" style="margin-bottom:12px"><strong>Puntos extra seg&uacute;n lugar:</strong><br>
+    1.er lugar +1.0 &middot; 2.do +0.8 &middot; 3.er +0.6 &middot; 4.to +0.4 &middot; 5.to +0.2</div>
+    <div class="inp-row">
+      <input type="text" class="n-input" id="ni" placeholder="Escribe tu nombre completo..." maxlength="70"/>
+      <button class="go-btn" onclick="go()">Comenzar &#9654;</button>
+    </div>
+  </div>`;
+  const i=document.getElementById('ni');
+  i.addEventListener('keydown',e=>{if(e.key==='Enter')go();});
+  i.focus();
+}
+
+function go(){
+  const v=document.getElementById('ni').value.trim();
+  if(!v){document.getElementById('ni').style.borderColor='#E53935';return;}
+  nm=v;sc=0;cor=0;err=0;
+  dn={0:false,1:false,2:false,3:false,4:false};
+  fs={0:0,1:0,2:0,3:0,4:0};
+  cf=null;cq=0;
+  renderGame();
+}
+
+function renderGame(){
+  document.getElementById('sv').innerHTML=`
+  <div class="hud">
+    <div class="hc"><div class="hl">Puntaje</div><div class="hv g" id="hs">0 pts</div></div>
+    <div class="hc"><div class="hl">Correctas</div><div class="hv" id="hc2">0/${TQ}</div></div>
+    <div class="hc"><div class="hl">Errores</div><div class="hv r" id="he">0</div></div>
+  </div>
+  <div class="pb-wrap">
+    <div class="pb-row"><span>${nm}</span><span id="pl">0 de ${TQ}</span></div>
+    <div class="pb"><div class="pf" id="pf" style="width:0%"></div></div>
+  </div>
+  <div class="ftabs" id="ftabs"></div>
+  <div id="qa"></div>`;
+  renderFtabs();renderQ();
+}
+
+function upd(){
+  const t=cor+err;
+  document.getElementById('hs').textContent=sc+' pts';
+  document.getElementById('hc2').textContent=cor+'/'+TQ;
+  document.getElementById('he').textContent=err;
+  document.getElementById('pf').style.width=Math.round((t/TQ)*100)+'%';
+  document.getElementById('pl').textContent=t+' de '+TQ;
+}
+
+function renderFtabs(){
+  const c=document.getElementById('ftabs');if(!c)return;c.innerHTML='';
+  F.forEach(f=>{
+    const t=document.createElement('button');
+    t.className='ft f'+f.id+(dn[f.id]?' fd':'')+(cf===f.id?' fa':'');
+    t.textContent=(dn[f.id]?'✓ ':'')+f.sh;
+    t.onclick=()=>{if(!dn[f.id]){cf=f.id;cq=0;ans=false;renderFtabs();renderQ();}};
+    c.appendChild(t);
+  });
+}
+
+function renderQ(){
+  const a=document.getElementById('qa');if(!a)return;
+  if(cf===null){
+    a.innerHTML='<div class="card" style="text-align:center;padding:26px;color:#888;font-size:13px">Selecciona una Fuerza de Porter para comenzar.</div>';return;
+  }
+  const fo=F[cf];
+  if(cq>=fo.qs.length){
+    dn[cf]=true;renderFtabs();
+    if(Object.values(dn).every(v=>v)){renderFin();return;}
+    a.innerHTML='<div class="card" style="text-align:center;padding:20px;color:#1B5E20;font-size:13px;font-weight:700">&#10003; Fuerza completada &mdash; elige la siguiente arriba.</div>';return;
+  }
+  const q=fo.qs[cq];ans=false;
+  a.innerHTML=`<div class="card" id="qc">
+    <div class="qm">
+      <span class="qb" style="background:${fo.bg_};color:${fo.tx};border:1px solid ${fo.bd}">${fo.bg}</span>
+      <span class="qp">${q.p} pts</span>
+    </div>
+    <div class="qt">${q.q}</div>
+    <div class="opts" id="opts"></div>
+    <div id="fb2"></div>
+  </div>`;
+  q.o.forEach((o,i)=>{
+    const b=document.createElement('button');b.className='opt';b.textContent=o;
+    b.onclick=()=>pick(i,q,fo);
+    document.getElementById('opts').appendChild(b);
+  });
+}
+
+function pick(idx,q,fo){
+  if(ans)return;ans=true;
+  const btns=document.querySelectorAll('.opt');btns.forEach(b=>b.disabled=true);
+  const ok=idx===q.a;
+  if(ok){sc+=q.p;fs[fo.id]+=q.p;cor++;}else{err++;}
+  btns[idx].classList.add(ok?'ok':'no');
+  if(!ok)btns[q.a].classList.add('rv');
+  document.getElementById('fb2').innerHTML=`<div class="fb ${ok?'fb-ok':'fb-no'}"><strong>${ok?'Correcto +'+q.p+' pts.':'Incorrecto.'}</strong> ${q.f}</div>`;
+  upd();
+  const nb=document.createElement('button');nb.className='nxt';
+  nb.textContent=cq===fo.qs.length-1?'Finalizar esta fuerza \u2192':'Siguiente pregunta \u2192';
+  nb.onclick=()=>{cq++;renderFtabs();renderQ();};
+  document.getElementById('qc').appendChild(nb);
+}
+
+async function renderFin(){
+  const pct=Math.round((cor/TQ)*100);
+  const ts=new Date().toLocaleString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  const result={name:nm,score:sc,correct:cor,errors:err,pct,forceScores:{...fs},date:ts};
+
+  let bd='';
+  F.forEach(f=>{
+    const mx=f.qs.reduce((s,q)=>s+q.p,0);
+    bd+=`<div class="br"><span class="bn">${f.sh}</span><span class="bp">${fs[f.id]}/${mx} pts (${Math.round((fs[f.id]/mx)*100)}%)</span></div>`;
+  });
+
+  document.getElementById('qa').innerHTML=`<div class="card fin-wrap">
+    <div style="font-size:13px;font-weight:700;color:#1B5E20;margin-bottom:6px">${nm}</div>
+    <div class="fin-score">${sc}</div>
+    <div class="fin-lbl">puntos de ${MP} posibles</div>
+    <div style="font-size:12px;color:#555;margin-bottom:12px">${cor} de ${TQ} correctas &middot; ${pct}% de acierto</div>
+    <div class="bdown">${bd}</div>
+    <div class="sav-msg" id="sm">&#8987; Guardando resultado en la nube...</div>
+    <div id="ps"></div>
+    <button class="retry" onclick="resetS()">Intentar de nuevo</button>
+  </div>`;
+
+  const el=document.querySelector('.ftabs');if(el)el.innerHTML='';
+  const pw=document.querySelector('.pb-wrap');if(pw)pw.style.display='none';
+  const hu=document.querySelector('.hud');if(hu)hu.style.display='none';
+
+  const saved=await dbPost(result);
+  document.getElementById('sm').style.display='none';
+  const ps=document.getElementById('ps');
+
+  if(saved){
+    const all=await dbGet();
+    const sorted=all.sort((a,b)=>b.score-a.score);
+    const pos=sorted.findIndex(r=>r.name===nm&&r.score===sc)+1;
+    const ep=pos>=1&&pos<=EP.length?EP[pos-1]:0;
+    ps.innerHTML=ep>0
+      ?`<div class="sp sp-g">&#9733; Posici&oacute;n #${pos} &mdash; Punto extra: +${ep.toFixed(1)}</div>`
+      :`<div class="sp sp-gr"># ${pos} en el ranking actual &mdash; sin punto extra</div>`;
+    ps.innerHTML+=`<div style="font-size:11px;color:#888;margin-top:6px">&#10003; Resultado guardado. Tu docente puede revisarlo en cualquier momento.</div>`;
+  } else {
+    ps.innerHTML=`<div class="sp sp-w">&#9888; Error al guardar. Toma captura de pantalla como respaldo.</div>`;
+  }
+}
+
+function resetS(){
+  nm='';
+  const hu=document.querySelector('.hud');if(hu)hu.style.display='';
+  const pw=document.querySelector('.pb-wrap');if(pw)pw.style.display='';
+  renderName();
+}
+
+// TEACHER
+async function renderT(){
+  const tv=document.getElementById('tv');
+  tv.innerHTML=`<div class="ld"><div class="sp2"></div>Cargando resultados desde Firebase...</div>`;
+  if(!OK){
+    tv.innerHTML=`<div class="card emp"><div class="et">&#9888; Firebase no configurado</div>Pega tu URL en la l&iacute;nea: <code style="background:#FFF3E0;padding:2px 5px;border-radius:4px;font-size:11px">const FIREBASE_URL = "TU_URL_AQUI";</code></div>`;return;
+  }
+  const res=await dbGet();
+  if(res.length===0){
+    tv.innerHTML=`<div class="card emp"><div class="et">Sin resultados a&uacute;n</div>Los alumnos a&uacute;n no han completado el juego. Los resultados aparecer&aacute;n aqu&iacute; autom&aacute;ticamente en cuanto terminen, desde cualquier dispositivo o red.</div>`;return;
+  }
+
+  const srt=[...res].sort((a,b)=>b.score-a.score);
+  const avS=Math.round(res.reduce((s,r)=>s+r.score,0)/res.length);
+  const avP=Math.round(res.reduce((s,r)=>s+r.pct,0)/res.length);
+  const win=srt[0];
+
+  const fa=F.map(f=>{
+    const mx=f.qs.reduce((s,q)=>s+q.p,0);
+    const av=res.reduce((s,r)=>s+(r.forceScores&&r.forceScores[f.id]!=null?r.forceScores[f.id]:0),0)/res.length;
+    return{n:f.sh,p:Math.round((av/mx)*100)};
+  });
+
+  let fh='';
+  fa.forEach(f=>{
+    const c=f.p>=70?'':f.p>=40?'md':'lw';
+    fh+=`<div class="fbr"><div class="fbn">${f.n}</div><div class="fbt"><div class="fbf ${c}" style="width:${f.p}%"></div></div><div class="fbp">${f.p}%</div></div>`;
+  });
+
+  let rows='';
+  srt.forEach((r,i)=>{
+    const rc=i===0?'rn1':i===1?'rn2':i===2?'rn3':'rnx';
+    const ep=i<EP.length?EP[i]:0;
+    const eh=ep>0?`<span class="xp ${XC[i]}">+${ep.toFixed(1)} pt</span>`:`<span class="xp xn">sin extra</span>`;
+    const bw=Math.max(Math.round((r.score/MP)*100),4);
+    const bc=r.pct>=70?'':r.pct>=40?'md':'lw';
+    rows+=`<tr>
+      <td><span class="rn ${rc}">${i+1}</span></td>
+      <td style="font-weight:${i===0?'700':'500'};color:${i===0?'#1B5E20':'#333'}">${r.name}</td>
+      <td><div class="sc-cell"><div class="sb ${bc}" style="width:${bw}px"></div><strong>${r.score}</strong> pts</div></td>
+      <td style="text-align:center">${r.correct}/${TQ}</td>
+      <td style="text-align:center">${r.pct}%</td>
+      <td>${eh}</td>
+      <td style="font-size:10px;color:#888;white-space:nowrap">${r.date||'&mdash;'}</td>
+    </tr>`;
+  });
+
+  tv.innerHTML=`
+  <div class="wb"><span class="ws">&#9733;</span>
+  L&iacute;der: <span style="margin:0 3px">${win.name}</span> &mdash; ${win.score} pts (${win.pct}% acierto) &mdash; +${EP[0].toFixed(1)} punto extra</div>
+
+  <div class="card">
+    <div class="t-top">
+      <div><div class="t-main">Panel del docente</div>
+      <div class="t-ct">${res.length} alumno(s) registrados &middot; Resultados en tiempo real (Firebase)</div></div>
+      <div class="t-acts">
+        <button class="tb" onclick="renderT()">&#8635; Actualizar</button>
+        <button class="tb dg" onclick="doClear()">&#128465; Borrar todo</button>
+      </div>
+    </div>
+
+    <div class="sg">
+      <div class="sc"><div class="sl">Alumnos</div><div class="sv ac">${res.length}</div></div>
+      <div class="sc"><div class="sl">Prom. puntaje</div><div class="sv ac">${avS} pts</div></div>
+      <div class="sc"><div class="sl">Prom. acierto</div><div class="sv">${avP}%</div></div>
+      <div class="sc"><div class="sl">M&aacute;ximo</div><div class="sv">${MP} pts</div></div>
+    </div>
+
+    <div class="stt">Acierto promedio por fuerza de Porter</div>
+    <div class="fbars">${fh}</div>
+
+    <div class="stt">Ranking completo</div>
+    <div style="overflow-x:auto">
+      <table class="rtbl">
+        <thead><tr><th>#</th><th>Alumno</th><th>Puntaje</th><th>Correctas</th><th>% Acierto</th><th>Punto extra</th><th>Fecha</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+
+    <div class="sn">Escala de puntos extra: 1.er +1.0 &middot; 2.do +0.8 &middot; 3.er +0.6 &middot; 4.to +0.4 &middot; 5.to +0.2 &middot; Del 6.to en adelante: sin punto extra</div>
+  </div>`;
+}
+
+async function doClear(){
+  if(confirm('\u00bfBorrar TODOS los resultados? Esta acci\u00f3n no se puede deshacer.')){
+    await dbDel();renderT();
+  }
+}
+
+renderName();
+</script>
+</body>
+</html>
