@@ -172,9 +172,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     </div>
   </div>
 
-  <div class="cfg-warn" id="cfg-warn">
+  <div class="cfg-warn" id="cfg-warn" style="display:none">
     <strong>&#9888; Paso pendiente:</strong> Antes de publicar, reemplaza la URL de Firebase en el c&oacute;digo.<br>
-    Busca: <code>const FIREBASE_URL = "https://f-porter-default-rtdb.firebaseio.com/";</code> y pega tu URL real.
+    Busca: <code>const FIREBASE_URL = "https://f-porter-default-rtdb.firebaseio.com";</code> y pega tu URL real.
   </div>
 
   <div class="tabs">
@@ -191,12 +191,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 //  PON TU URL DE FIREBASE AQUI  (Realtime Database)
 //  Ejemplo: "https://mi-proyecto-xxxxx-default-rtdb.firebaseio.com"
 // ================================================================
-const FIREBASE_URL = "TU_URL_AQUI";
+const FIREBASE_URL = "https://f-porter-default-rtdb.firebaseio.com";
 // ================================================================
 
 const PATH = "/porter_aeromexico";
 const OK = FIREBASE_URL !== "TU_URL_AQUI" && FIREBASE_URL.includes("firebaseio");
-if(!OK) document.getElementById('cfg-warn').style.display='block';
+/* Firebase configured */
 
 async function dbPost(d){
   if(!OK) return null;
@@ -458,7 +458,7 @@ async function renderT(){
   const tv=document.getElementById('tv');
   tv.innerHTML=`<div class="ld"><div class="sp2"></div>Cargando resultados desde Firebase...</div>`;
   if(!OK){
-    tv.innerHTML=`<div class="card emp"><div class="et">&#9888; Firebase no configurado</div>Pega tu URL en la l&iacute;nea: <code style="background:#FFF3E0;padding:2px 5px;border-radius:4px;font-size:11px">const FIREBASE_URL = "TU_URL_AQUI";</code></div>`;return;
+    tv.innerHTML=`<div class="card emp"><div class="et">&#9888; Firebase no configurado</div>Pega tu URL en la l&iacute;nea: <code style="background:#FFF3E0;padding:2px 5px;border-radius:4px;font-size:11px">const FIREBASE_URL = "https://f-porter-default-rtdb.firebaseio.com";</code></div>`;return;
   }
   const res=await dbGet();
   if(res.length===0){
